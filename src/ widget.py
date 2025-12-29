@@ -49,3 +49,17 @@ def mask_account_card(info: str) -> str:
 
 
 # Блок кода с тестированием
+if __name__ == '__main__':
+    # для карты
+    print(mask_account_card("Visa Platinum 7000792289606361"))
+
+    print(mask_account_card("Maestro 7000792289606361"))
+
+    # для счета
+    print(mask_account_card("Счет 73654108430135874305"))
+
+    # краевые случаи
+    # Краевые случаи
+    print(mask_account_card("Карта 12345"))  # → Карта 12345 (не 16 цифр)
+    print(mask_account_card("Счет ABCD1234"))  # → Счет ABCD1234 (не цифры)
+    print(mask_account_card("Короткая строка"))  # → Короткая строка (мало частей)
