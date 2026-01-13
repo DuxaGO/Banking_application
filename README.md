@@ -1,2 +1,2 @@
 # Banking_application
-Development of a banking applicati
+Development of a banking application
