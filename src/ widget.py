@@ -1,3 +1,6 @@
+from src.masks import get_mask_card_number, get_mask_account
+
+
 def mask_account_card(info: str) -> str:
     """
     Принимает название карты и ее номер или счет и транфорирует в зааскированную версию
@@ -18,33 +21,26 @@ def mask_account_card(info: str) -> str:
     # разбиваем по частям
     parts = info.strip().split()
     if len(parts) < 2:
-        return info # Если формат не соответсвует возвращаем исходник
-
+        return info  # Если формат не соответсвует возвращаем исходник
 
     # Определяем тип данных
     type_part = ' '.join(parts[:-1])
     number_part = parts[-1]
+    valid_account_types = {"счет", "счёт"}
 
-
-    # Счет должен состоять только из цифр, если нет возвращаем исходник
-    if not number_part.isdigit():
-        return info
-
-    if type_part.lower() == 'счет':
-        # если счет
-        masked_number = '**' + number_part[-4:]
+    if type_part.lower() in valid_account_types:
+        # Если это счёт — оборачиваем в try/except
+        try:
+            masked_number = get_mask_account(number_part)
+        except ValueError:
+            masked_number = number_part  # Возвращаем исходный номер при ошибке
     else:
-        # для карты проверяем длину, должно быть 16 символов
-        if len(number_part) != 16:
-            return info
+        # Если это карта — уже есть обработка ошибок
+        try:
+            masked_number = get_mask_card_number(number_part)
+        except ValueError:
+            masked_number = number_part
 
-
-        # формируем маску для карты: 7000 79** **** 6361
-        masked_number = (
-            number_part[:4] + ' ' +
-            number_part[4:6] + '**' + ' ' +
-            '****' + ' ' + number_part[-4:]
-        )
     return f'{type_part} {masked_number}'
 
 
@@ -59,7 +55,7 @@ def get_date(date_string: str) -> str:
     if 'T' in date_string:
         date_part = date_string.split('T')[0]
     else:
-        date_part = date_string # возвращаем если не соответсвует
+        date_part = date_string  # возвращаем если не соответсвует
 
     # разбиваем по "-"
     parts = date_part.split('-')
@@ -71,11 +67,17 @@ def get_date(date_string: str) -> str:
     year, month, day = parts
 
     # проверяем все параметры даты на соответствие длинны и числам
-    if (len(year) == 4 and len(month) == 2 and len(day) ==2 and year.isdigit() and month.isdigit() and day.isdigit()):
+    if (
+        len(year) == 4
+        and len(month) == 2
+        and len(day) == 2
+        and year.isdigit()
+        and month.isdigit()
+        and day.isdigit()
+    ):
         return f'{day}.{month}.{year}'
     else:
-        return date_string # возвращаем если не соответсвует
-
+        return date_string  # возвращаем если не соответсвует
 
 
 # Блок кода с тестированием
@@ -95,12 +97,8 @@ if __name__ == '__main__':
     print(mask_account_card("Короткая строка"))  # → Короткая строка (мало частей)
 
 
-# Тестирование функции
-if __name__ == "__main__":
-    # ... предыдущие тесты для mask_account_card ...
-
     # Тест для get_date
     print(get_date("2024-03-11T02:26:18.671407"))  # → 11.03.2024
-    print(get_date("2025-12-29"))                      # → 29.12.2025
-    print(get_date("Некорректная дата"))             # → Некорректная дата
-    print(get_date("2024-5-5"))                   # → 2024-5-5 (не 2 цифры)
+    print(get_date("2025-12-29"))  # → 29.12.2025
+    print(get_date("Некорректная дата"))  # → Некорректная дата
+    print(get_date("2024-5-5"))  # → 2024-5-5 (не 2 цифры)
