@@ -2,12 +2,6 @@ import pytest
 
 from src.masks import get_mask_card_number, get_mask_account
 
-
-# def test_valid_16_digit_card():
-#     """ Стандартный 16-ти значный номер карты"""
-#     result = get_mask_card_number("1234 1234 1234 1234")
-#     assert result == "123412******1234"
-
 @pytest.mark.parametrize("card_number,expected", [
     ("1234 1234 1234 1234","123412******1234"),
     ("4321-4321-4321-4321","432143******4321")
