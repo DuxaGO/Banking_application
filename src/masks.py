@@ -37,9 +37,3 @@ def get_mask_account(account_number: str) -> str:
     masked = "*" * 16 + visible_num
     return masked
 
-
-# Пример для карты
-print(get_mask_card_number("1234 5678 9012 3456"))  # 123456******3456
-
-# Пример для счёта
-print(get_mask_account("1234 5678 9012 3456 7890"))  # ****************7890
