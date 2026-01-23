@@ -7,6 +7,8 @@ def get_mask_card_number(card_number: str) -> str:
     # Удаляем пробелы и дефисы
     cleaned = card_number.replace(" ", "").replace("-", "")
 
+
+
     if not cleaned.isdigit():
         raise ValueError("Номер карты должен содержать только цифры")
 
