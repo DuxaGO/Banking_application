@@ -24,13 +24,13 @@ def sort_by_date(
     Сортируем список по дате, по умолчанию по убыванию
     """
 
-    def get_sort_key(item: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def get_sort_key(item: Dict[str, Any]) -> str:
         """
         Функция сортирует список словарей по ключу date в порядке убывания по умолчанию
         """
         date_val = item.get("date")
         if isinstance(date_val, str):
             return date_val
-        return None
+        return ""
 
     return sorted(data, key=get_sort_key, reverse=reverse)
