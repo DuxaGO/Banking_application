@@ -83,3 +83,80 @@ def test_valid_card_number_parametrize(card_number, expected):
 def test_get_date(input_string, expected):
     result = get_date(input_string)
     assert result == expected
+
+# Тесты с использование фикстур
+@pytest.fixture
+def valid_card_inputs():
+    """
+    Валидные входные строки для карт (разные форматы номеров).
+    Ожидаем корректную маскировку по шаблону: «XXXX XX** **** XXXX».
+    """
+    return [
+        "Visa Platinum 7000792289606361",
+        "MasterCard 5412345678901234",
+        "Maestro 6700123456789012",
+        "МИР 2200700367891234",  # российская платёжная система
+    ]
+
+@pytest.fixture
+def valid_account_inputs():
+    """
+    Валидные входные строки для счетов (разные длины номеров).
+    Ожидаем маскировку: «**XXXX» (последние 4 цифры).
+    """
+    return [
+        "Счет 73654108430135874305",
+        "счёт 12345678901234567890",  # строчная «ё»
+        "СЧЕТ 00000000000000001234",  # заглавные буквы
+    ]
+
+@pytest.fixture
+def data_only_valid_dates():
+    """Данные с валидными датами (без времени)."""
+    return [
+        {"id": 1, "date": "2023-01-05"},
+        {"id": 2, "date": "2023-01-01"},
+        {"id": 3, "date": "2023-01-03"},
+    ]
+
+@pytest.fixture
+def sorted_ascending_expected():
+    """Ожидаемый результат сортировки по возрастанию (без времени)."""
+    return [
+        {"id": 2, "date": "2023-01-01"},
+        {"id": 3, "date": "2023-01-03"},
+        {"id": 1, "date": "2023-01-05"},
+    ]
+
+
+
+def test_mask_account_card_valid_accounts(valid_account_inputs):
+    """Проверяем маскировку счетов по шаблону '**XXXX'."""
+    for input_str in valid_account_inputs:
+        result = mask_account_card(input_str)
+
+        # Разделяем на тип счёта и номер
+        parts = result.rsplit(' ', 1)
+        assert len(parts) == 2, f"Некорректный формат: {result}"
+
+        account_type = parts[0].lower()
+        masked_number = parts[1]
+
+        # Проверка типа счёта
+        assert account_type in {"счет", "счёт", "счет"}, f"Неверный тип счёта: {account_type}"
+
+        # Проверка маскированного номера
+        assert masked_number.startswith("**"), "Номер счёта не начинается с **"
+
+
+def test_mask_account_card_invalid_input():
+    """Проверка обработки некорректного ввода."""
+    # Пустая строка
+    assert mask_account_card("") == ""
+
+    # Строка без номера
+    assert mask_account_card("Visa Platinum") == "Visa Platinum"
+
+    # Некорректный номер карты
+    result = mask_account_card("Visa 123")
+    assert "123" in result, "Некорректный номер должен сохраняться"
