@@ -84,6 +84,7 @@ def test_get_date(input_string, expected):
     result = get_date(input_string)
     assert result == expected
 
+
 # Тесты с использование фикстур
 @pytest.fixture
 def valid_card_inputs():
@@ -98,6 +99,7 @@ def valid_card_inputs():
         "МИР 2200700367891234",  # российская платёжная система
     ]
 
+
 @pytest.fixture
 def valid_account_inputs():
     """
@@ -110,6 +112,7 @@ def valid_account_inputs():
         "СЧЕТ 00000000000000001234",  # заглавные буквы
     ]
 
+
 @pytest.fixture
 def data_only_valid_dates():
     """Данные с валидными датами (без времени)."""
@@ -119,6 +122,7 @@ def data_only_valid_dates():
         {"id": 3, "date": "2023-01-03"},
     ]
 
+
 @pytest.fixture
 def sorted_ascending_expected():
     """Ожидаемый результат сортировки по возрастанию (без времени)."""
@@ -127,7 +131,6 @@ def sorted_ascending_expected():
         {"id": 3, "date": "2023-01-03"},
         {"id": 1, "date": "2023-01-05"},
     ]
-
 
 
 def test_mask_account_card_valid_accounts(valid_account_inputs):
@@ -143,7 +146,11 @@ def test_mask_account_card_valid_accounts(valid_account_inputs):
         masked_number = parts[1]
 
         # Проверка типа счёта
-        assert account_type in {"счет", "счёт", "счет"}, f"Неверный тип счёта: {account_type}"
+        assert account_type in {
+            "счет",
+            "счёт",
+            "счет",
+        }, f"Неверный тип счёта: {account_type}"
 
         # Проверка маскированного номера
         assert masked_number.startswith("**"), "Номер счёта не начинается с **"
