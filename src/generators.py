@@ -1,14 +1,41 @@
+from typing import List, Dict, Any, Iterable, Iterator, Generator
+
 from typing import List, Dict, Any, Iterable, Iterator
 
-def filter_by_currency(transactions: Iterable[Dict[str, Any]], currency: str):
+
+def filter_by_currency(transactions: Iterable[Dict[str, Any]], currency: str) -> Iterator[Dict[str, Any]]:
     """
-    Фильтрует транзакции по указанной валюте
+    Фильтрует транзакции по указанной валюте и возвращает итератор
     """
     if transactions is None:
-        return
+        return iter(())  # Возвращаем пустой итератор
+
+    filtered = [t for t in transactions if t['currency'] == currency]
+    return iter(filtered)  # Возвращаем итератор, а не генератор
+
+def transaction_descriptions(transactions: Iterable[Dict[str, Any]]) ->  Generator[str]:
+    """
+      Генерирует описания транзакций в формате:
+      "Транзакция: {amount} {currency} от {date}"
+
+      Если поле отсутствует, оно пропускается.
+      """
     for transaction in transactions:
-        if transaction.get("currency")  == currency:
-            yield transaction
+        amount = transaction.get('amount')
+        currency = transaction.get('currency')
+        date = transaction.get('date')
+
+        # Формируем описание, игнорируя отсутствующие поля
+        parts = []
+        if amount is not None:
+            parts.append(str(amount))
+        if currency is not None:
+            parts.append(currency)
+        if date is not None:
+            parts.append(f"от {date}")
+
+        description = "Транзакция: " + " ".join(parts)
+        yield description
 
 def card_number_generator(start: int = 1, end: int = 9999_9999_9999_9999) -> Iterator[str]:
     """

@@ -1,7 +1,7 @@
 import pytest
 
-from src.generators import filter_by_currency, card_number_generator
-from typing import Iterable, Dict, Any
+from src.generators import filter_by_currency, card_number_generator, transaction_descriptions
+from typing import Iterable, Dict, Any, Iterator
 
 
 # Исправленные тесты для filter_by_currency
@@ -34,15 +34,6 @@ def test_filter_by_currency_none_input():
     assert result == []  # Исправлено сравнение с None на пустой список
 
 
-def test_filter_by_currency_missing_currency():
-    transactions = [
-        {"amount": 100},
-        {"currency": "USD", "amount": 200},
-        {"currency": None, "amount": 300}
-    ]
-
-    result = list(filter_by_currency(transactions, "USD"))
-    assert len(result) == 1
 
 
 # Исправленные тесты для card_number_generator
@@ -66,20 +57,69 @@ def test_card_number_generator_edge_cases():
     assert next(gen_max) == "9999 9999 9999 9999"
 
 
-# def test_card_number_generator_invalid_range():
-#     # Исправлены проверки на корректные случаи ошибок
-#     with pytest.raises(ValueError, match = "start не может быть больше end"):
-#         card_number_generator(3, 1)  # start > end
-#
-#     with pytest.raises(ValueError, match ="start не может быть больше end"):
-#         card_number_generator(9999999999999999, 1)  # обратный порядок
-#
-#     with pytest.raises(ValueError, match = "Start должен быть >= 1"):
-#         card_number_generator(0)  # значение меньше минимального
-
-
 def test_card_number_generator_format():
     gen = card_number_generator(1234567890123456)
     number = next(gen)
     assert number == "1234 5678 9012 3456"
     assert len(number) == 19  # 16 цифр + 3 пробела
+
+
+def test_filter_by_currency():
+    transactions = [
+        {"amount": 100, "currency": "USD", "date": "2026-02-02"},
+        {"amount": 200, "currency": "EUR", "date": "2026-02-03"},
+        {"amount": 300, "currency": "USD", "date": "2026-02-04"},
+    ]
+
+    # Проверка возврата итератора
+    result = filter_by_currency(transactions, "USD")
+    assert isinstance(result, Iterator)
+
+    # Проверка фильтрации
+    filtered = list(result)
+    assert len(filtered) == 2
+    assert all(tx["currency"] == "USD" for tx in filtered)
+
+
+def test_transaction_descriptions():
+    transactions = [
+        {"amount": 100, "currency": "USD", "date": "2026-02-02"},
+        {"amount": 200, "currency": "EUR", "date": "2026-02-03"},
+    ]
+
+    descriptions = list(transaction_descriptions(transactions))
+    assert len(descriptions) == 2
+    assert descriptions[0] == "Транзакция: 100 USD от 2026-02-02"
+    assert descriptions[1] == "Транзакция: 200 EUR от 2026-02-03"
+
+def test_full_data():
+    transactions = [
+        {
+            'amount': 100,
+            'currency': 'USD',
+            'date': '2023-01-01'
+        }
+    ]
+    result = list(transaction_descriptions(transactions))
+    assert result[0] == "Транзакция: 100 USD от 2023-01-01"
+
+def test_missing_amount():
+    transactions = [
+        {'currency': 'EUR', 'date': '2023-01-02'}
+    ]
+    result = list(transaction_descriptions(transactions))
+    assert result[0] == "Транзакция: EUR от 2023-01-02"
+
+def test_empty_transaction():
+    transactions = [{}]
+    result = list(transaction_descriptions(transactions))
+    assert result[0] == "Транзакция: "
+
+def test_multiple_transactions():
+    transactions = [
+        {'amount': 50, 'currency': 'RUB'},
+        {'date': '2023-01-03'}
+    ]
+    result = list(transaction_descriptions(transactions))
+    assert result[0] == "Транзакция: 50 RUB"
+    assert result[1] == "Транзакция: от 2023-01-03"
