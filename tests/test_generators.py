@@ -1,7 +1,12 @@
+from typing import Any, Dict, Iterable, Iterator
+
 import pytest
 
-from src.generators import filter_by_currency, card_number_generator, transaction_descriptions
-from typing import Iterable, Dict, Any, Iterator
+from src.generators import (
+    card_number_generator,
+    filter_by_currency,
+    transaction_descriptions,
+)
 
 
 # Исправленные тесты для filter_by_currency
@@ -10,7 +15,7 @@ def test_filter_by_currency_success():
         {"currency": "USD", "amount": 100},
         {"currency": "EUR", "amount": 200},
         {"currency": "USD", "amount": 300},
-        {"currency": "RUB", "amount": 400}
+        {"currency": "RUB", "amount": 400},
     ]
 
     result = list(filter_by_currency(transactions, "USD"))
@@ -22,7 +27,7 @@ def test_filter_by_currency_success():
 def test_filter_by_currency_no_matches():
     transactions = [
         {"currency": "EUR", "amount": 200},
-        {"currency": "RUB", "amount": 400}
+        {"currency": "RUB", "amount": 400},
     ]
 
     result = list(filter_by_currency(transactions, "USD"))
@@ -34,14 +39,10 @@ def test_filter_by_currency_none_input():
     assert result == []  # Исправлено сравнение с None на пустой список
 
 
-
-
 # Исправленные тесты для card_number_generator
 def test_card_number_generator_basic():
     gen = card_number_generator(1000000000000000, 1000000000000002)
-    expected = ["1000 0000 0000 0000",
-                "1000 0000 0000 0001",
-                "1000 0000 0000 0002"]
+    expected = ["1000 0000 0000 0000", "1000 0000 0000 0001", "1000 0000 0000 0002"]
 
     result = list(gen)
     assert result == expected
@@ -92,34 +93,27 @@ def test_transaction_descriptions():
     assert descriptions[0] == "Транзакция: 100 USD от 2026-02-02"
     assert descriptions[1] == "Транзакция: 200 EUR от 2026-02-03"
 
+
 def test_full_data():
-    transactions = [
-        {
-            'amount': 100,
-            'currency': 'USD',
-            'date': '2023-01-01'
-        }
-    ]
+    transactions = [{'amount': 100, 'currency': 'USD', 'date': '2023-01-01'}]
     result = list(transaction_descriptions(transactions))
     assert result[0] == "Транзакция: 100 USD от 2023-01-01"
 
+
 def test_missing_amount():
-    transactions = [
-        {'currency': 'EUR', 'date': '2023-01-02'}
-    ]
+    transactions = [{'currency': 'EUR', 'date': '2023-01-02'}]
     result = list(transaction_descriptions(transactions))
     assert result[0] == "Транзакция: EUR от 2023-01-02"
+
 
 def test_empty_transaction():
     transactions = [{}]
     result = list(transaction_descriptions(transactions))
     assert result[0] == "Транзакция: "
 
+
 def test_multiple_transactions():
-    transactions = [
-        {'amount': 50, 'currency': 'RUB'},
-        {'date': '2023-01-03'}
-    ]
+    transactions = [{'amount': 50, 'currency': 'RUB'}, {'date': '2023-01-03'}]
     result = list(transaction_descriptions(transactions))
     assert result[0] == "Транзакция: 50 RUB"
     assert result[1] == "Транзакция: от 2023-01-03"

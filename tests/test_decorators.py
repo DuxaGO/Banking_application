@@ -1,6 +1,10 @@
-import pytest
-from src.decorators import log  # относительный импорт
 import time
+
+import Any
+import pytest
+
+from src.decorators import log  # относительный импорт
+
 
 class TestLogDecorator:
     def test_successful_execution_console(self, capsys):
@@ -34,6 +38,7 @@ class TestLogDecorator:
         @log()
         def get_random() -> int:
             import random
+
             return random.randint(1, 100)
 
         result = get_random()
@@ -49,6 +54,7 @@ class TestLogDecorator:
             @log()
             def inner(y: int) -> int:
                 return y * 2
+
             return inner(x) + 1
 
         result = outer(5)
