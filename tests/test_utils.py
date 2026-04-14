@@ -1,14 +1,16 @@
-import pytest
 import json
+
 from unittest.mock import mock_open, patch
-from utils import load_transactions_from_json
+
+from src.utils import load_transactions_from_json
+
 
 class TestLoadTransactionsFromJSON:
     def test_valid_json_file(self):
         """Тест: корректный JSON-файл с списком транзакций."""
         mock_data = [
             {"id": 1, "amount": 1000, "currency": "RUB"},
-            {"id": 2, "amount": 50, "currency": "USD"}
+            {"id": 2, "amount": 50, "currency": "USD"},
         ]
         with patch("builtins.open", mock_open(read_data=json.dumps(mock_data))):
             result = load_transactions_from_json("dummy_path.json")
