@@ -19,3 +19,13 @@
 Установите зависимости:
 ```bash
 pip install -r requirements-dev.txt
+
+## API
+
+POST /convert
+
+{
+  "amount": 100,
+  "from_currency": "USD",
+  "to_currency": "RUB"
+}

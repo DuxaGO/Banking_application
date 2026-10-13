@@ -36,3 +36,28 @@ def get_mask_account(account_number: str) -> str:
     visible_num = cleaned[-4:]
     masked = "*" * 16 + visible_num
     return masked
+
+
+import logging
+from pathlib import Path
+
+# Папка logs в корне проекта
+LOG_DIR = Path(__file__).resolve().parent / "logs"
+LOG_DIR.mkdir(exist_ok=True)
+
+# Создаём логер для модуля masks
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+# Записываем логи в файл, перезаписывая его при запуске
+file_handler = logging.FileHandler(
+    LOG_DIR / "masks.log",
+    mode="w",
+    encoding="utf-8",
+)
+
+formatter = logging.Formatter(
+    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
