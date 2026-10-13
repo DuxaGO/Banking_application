@@ -1,3 +1,5 @@
+import logging
+
 def get_mask_card_number(card_number: str) -> str:
     """
     Маскирует номер банковской карты, оставляет первые 6 и последние 4 цифры
@@ -38,7 +40,6 @@ def get_mask_account(account_number: str) -> str:
     return masked
 
 
-import logging
 from pathlib import Path
 
 # Папка logs в корне проекта

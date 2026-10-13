@@ -1,4 +1,4 @@
-import json
+import json, logging
 import os
 
 from typing import Any, Dict, List
@@ -27,3 +27,24 @@ def load_transactions_from_json(file_path: str) -> List[Dict[str, Any]]:
             return []
     except (json.JSONDecodeError, IOError):
         return []
+
+from pathlib import Path
+
+LOG_DIR = Path(__file__).resolve().parent / "logs"
+LOG_DIR.mkdir(exist_ok=True)
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+file_handler = logging.FileHandler(
+    LOG_DIR / "utils.log",
+        mode="w",
+        encoding="utf-8",
+)
+
+formatter = logging.Formatter(
+"%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+
